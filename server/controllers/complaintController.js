@@ -114,34 +114,62 @@ export async function getMyComplaints(req, res) {
 }
 
 /**
- * Public track endpoint for citizens to track an issue by complaint ID
+ * Public track endpoint for citizens to track an issue by complaint ID or search term
  * GET /api/complaints/track/:complaintId
  */
 export async function trackComplaint(req, res) {
   try {
     const { complaintId } = req.params;
-    const normalizedId = complaintId ? complaintId.trim().toUpperCase() : '';
+    const rawInput = complaintId ? decodeURIComponent(complaintId).trim() : '';
 
-    if (!normalizedId) {
+    if (!rawInput) {
       return res.status(400).json({
         success: false,
-        message: 'Complaint ID is required.',
+        message: 'Complaint ID or search term is required.',
       });
     }
 
-    // Retrieve complaint
-    const [rows] = await query(
+    const cleanInput = rawInput.toUpperCase().trim();
+
+    // 1. Try exact or clean ID lookup
+    let [rows] = await query(
       `SELECT c.*, d.name AS department_name
        FROM complaints c
        LEFT JOIN departments d ON c.department_id = d.id
        WHERE UPPER(c.complaint_id) = ?`,
-      [normalizedId]
+      [cleanInput]
     );
+
+    // 2. If not found and input does not start with FMC-, try prepending prefix or suffix search
+    if (!rows || rows.length === 0) {
+      const candidateFull = cleanInput.startsWith('FMC-') ? cleanInput : `FMC-2026-${cleanInput}`;
+      [rows] = await query(
+        `SELECT c.*, d.name AS department_name
+         FROM complaints c
+         LEFT JOIN departments d ON c.department_id = d.id
+         WHERE UPPER(c.complaint_id) = ?`,
+        [candidateFull]
+      );
+    }
+
+    // 3. If still not found, try flexible title or ID match
+    if (!rows || rows.length === 0) {
+      const [allMatches] = await query(
+        `SELECT c.*, d.name AS department_name
+         FROM complaints c
+         LEFT JOIN departments d ON c.department_id = d.id
+         WHERE UPPER(c.complaint_id) LIKE ? OR UPPER(c.title) LIKE ? OR UPPER(c.location) LIKE ?`,
+        [`%${cleanInput}%`, `%${cleanInput}%`, `%${cleanInput}%`]
+      );
+      if (allMatches && allMatches.length > 0) {
+        rows = allMatches;
+      }
+    }
 
     if (!rows || rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: `Complaint '${normalizedId}' not found. Please verify the ID and try again.`,
+        message: `No complaint found matching '${rawInput}'. Please verify the ID or search keyword.`,
       });
     }
 
@@ -166,6 +194,14 @@ export async function trackComplaint(req, res) {
         history: updates || [],
         photos: photos || [],
       },
+      matchedCount: rows.length,
+      allMatches: rows.slice(0, 5).map((r) => ({
+        id: r.id,
+        complaint_id: r.complaint_id,
+        title: r.title,
+        status: r.status,
+        category: r.category,
+      })),
     });
   } catch (error) {
     console.error('Track complaint error:', error);

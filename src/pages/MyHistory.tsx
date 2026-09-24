@@ -138,7 +138,11 @@ export const MyHistory: React.FC = () => {
 
               <div className="flex items-center space-x-3 shrink-0">
                 <StatusBadge status={item.status} size="sm" />
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-hover:translate-x-0.5 transition-all" />
+                <span className="hidden sm:inline-flex items-center space-x-1 text-xs font-semibold text-[#1E66F5] bg-blue-50 px-2.5 py-1 rounded-lg group-hover:bg-[#1E66F5] group-hover:text-white transition-all">
+                  <span>Track issue</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </span>
+                <ChevronRight className="sm:hidden w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-all" />
               </div>
             </div>
           ))}

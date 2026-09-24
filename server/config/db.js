@@ -269,33 +269,49 @@ class FallbackDatabase {
         return [rows];
       }
 
-      // Single complaint by complaint_id
-      if (/FROM complaints.*WHERE.*complaint_id =/i.test(cleanSql)) {
-        const complaintId = params[0];
-        const complaint = this.complaints.find((c) => c.complaint_id === complaintId);
-        if (!complaint) return [[]];
-        const user = this.users.find((u) => u.id === complaint.user_id);
-        const dept = this.departments.find((d) => d.id === complaint.department_id);
-        const row = {
-          ...complaint,
-          citizen_name: user ? user.name : 'Unknown Citizen',
-          citizen_email: user ? user.email : '',
-          citizen_phone: user ? user.phone : '',
-          department_name: dept ? dept.name : 'Unassigned',
-        };
-        return [[row]];
-      }
+      // Single complaint by complaint_id or id
+      if (
+        /FROM complaints.*WHERE/i.test(cleanSql) &&
+        (/complaint_id/i.test(cleanSql) || /c\.id\s*=/i.test(cleanSql) || /WHERE\s+id\s*=/i.test(cleanSql)) &&
+        !/user_id\s*=/i.test(cleanSql) &&
+        !/GROUP BY/i.test(cleanSql)
+      ) {
+        const paramVal = params[0];
+        const secondParamVal = params[1];
+        
+        let complaint = null;
+        if (paramVal !== undefined) {
+          const strParam = String(paramVal).trim().toUpperCase();
+          const numParam = Number(paramVal);
 
-      // Single complaint by id
-      if (/FROM complaints.*WHERE.*c\.id =|WHERE id =/i.test(cleanSql) && !/user_id =/i.test(cleanSql)) {
-        const id = Number(params[0]);
-        const complaint = this.complaints.find((c) => c.id === id);
+          complaint = this.complaints.find(
+            (c) =>
+              (numParam && c.id === numParam) ||
+              c.complaint_id.toUpperCase() === strParam ||
+              c.complaint_id.toUpperCase().endsWith(strParam) ||
+              c.complaint_id.toUpperCase().replace(/[^A-Z0-9]/g, '') === strParam.replace(/[^A-Z0-9]/g, '')
+          );
+        }
+
+        if (!complaint && secondParamVal !== undefined) {
+          const strSecond = String(secondParamVal).trim().toUpperCase();
+          const numSecond = Number(secondParamVal);
+          complaint = this.complaints.find(
+            (c) =>
+              (numSecond && c.id === numSecond) ||
+              c.complaint_id.toUpperCase() === strSecond ||
+              c.complaint_id.toUpperCase().endsWith(strSecond) ||
+              c.complaint_id.toUpperCase().replace(/[^A-Z0-9]/g, '') === strSecond.replace(/[^A-Z0-9]/g, '')
+          );
+        }
+
         if (!complaint) return [[]];
+
         const user = this.users.find((u) => u.id === complaint.user_id);
         const dept = this.departments.find((d) => d.id === complaint.department_id);
         const row = {
           ...complaint,
-          citizen_name: user ? user.name : 'Unknown Citizen',
+          citizen_name: user ? user.name : 'Citizen User',
           citizen_email: user ? user.email : '',
           citizen_phone: user ? user.phone : '',
           department_name: dept ? dept.name : 'Unassigned',
@@ -304,7 +320,7 @@ class FallbackDatabase {
       }
 
       // Complaints for specific user (My History)
-      if (/FROM complaints.*WHERE.*user_id =/i.test(cleanSql)) {
+      if (/FROM complaints.*WHERE.*user_id\s*=/i.test(cleanSql)) {
         const userId = Number(params[0]);
         const rows = this.complaints
           .filter((c) => c.user_id === userId)
@@ -319,17 +335,61 @@ class FallbackDatabase {
         return [rows];
       }
 
-      // All complaints (Admin queue / Recent reports)
+      // All complaints (Admin queue / Recent reports / Search / Filter)
       let list = this.complaints.map((c) => {
         const user = this.users.find((u) => u.id === c.user_id);
         const dept = this.departments.find((d) => d.id === c.department_id);
         return {
           ...c,
-          citizen_name: user ? user.name : 'Unknown Citizen',
+          citizen_name: user ? user.name : 'Citizen User',
           citizen_email: user ? user.email : '',
+          citizen_phone: user ? user.phone : '',
           department_name: dept ? dept.name : 'Unassigned',
         };
       });
+
+      // Apply in-memory filters if present in SQL query
+      if (/c\.status\s*=\s*\?/i.test(cleanSql)) {
+        const statusIdx = params.findIndex((p) =>
+          ['Submitted', 'Under Review', 'Assigned', 'In Progress', 'Resolved', 'Rejected'].includes(p)
+        );
+        if (statusIdx !== -1) {
+          list = list.filter((c) => c.status === params[statusIdx]);
+        }
+      }
+
+      if (/c\.category\s*=\s*\?/i.test(cleanSql)) {
+        const catIdx = params.findIndex((p) =>
+          typeof p === 'string' &&
+          [
+            'Garbage Accumulation',
+            'Damaged Roads',
+            'Streetlight Problems',
+            'Water Leakage',
+            'Drainage Problems',
+            'Public Toilet Issues',
+            'Traffic/Safety Issues',
+            'Park & Public Space',
+            'Other Civic Problems',
+          ].includes(p)
+        );
+        if (catIdx !== -1) {
+          list = list.filter((c) => c.category === params[catIdx]);
+        }
+      }
+
+      if (/LIKE\s*\?/i.test(cleanSql)) {
+        const searchParam = params.find((p) => typeof p === 'string' && p.startsWith('%') && p.endsWith('%'));
+        if (searchParam) {
+          const rawSearch = searchParam.replace(/%/g, '').toLowerCase().trim();
+          list = list.filter(
+            (c) =>
+              c.complaint_id.toLowerCase().includes(rawSearch) ||
+              c.title.toLowerCase().includes(rawSearch) ||
+              c.location.toLowerCase().includes(rawSearch)
+          );
+        }
+      }
 
       // Handle limit if present
       const limitMatch = cleanSql.match(/LIMIT\s+(\d+)/i);
@@ -419,20 +479,18 @@ class FallbackDatabase {
       }
 
       if (targetComplaint) {
-        if (/status = \?/i.test(cleanSql)) {
-          targetComplaint.status = params[0];
-        }
-        if (/department_id = \?/i.test(cleanSql)) {
-          const deptIdx = cleanSql.indexOf('department_id') > cleanSql.indexOf('status') ? 1 : 0;
-          targetComplaint.department_id = params[deptIdx] ? Number(params[deptIdx]) : null;
-        }
-        if (/assigned_to = \?/i.test(cleanSql)) {
-          const assignIdx = params.findIndex((p, idx) => typeof p === 'string' && idx > 0 && idx < params.length - 1);
-          if (assignIdx !== -1) targetComplaint.assigned_to = params[assignIdx];
-        }
-        if (/admin_remark = \?/i.test(cleanSql)) {
-          const remarkIdx = params.length - 2;
-          targetComplaint.admin_remark = params[remarkIdx];
+        // Match `field = ?` in the SET clause
+        const setMatch = cleanSql.match(/SET\s+(.+?)\s+WHERE/i);
+        if (setMatch) {
+          const assignments = setMatch[1].split(',').map((s) => s.trim());
+          assignments.forEach((assignment, idx) => {
+            const field = assignment.split('=')[0].trim().toLowerCase();
+            const val = params[idx];
+            if (field === 'status' && val !== undefined) targetComplaint.status = val;
+            if (field === 'department_id') targetComplaint.department_id = val ? Number(val) : null;
+            if (field === 'assigned_to') targetComplaint.assigned_to = val || null;
+            if (field === 'admin_remark') targetComplaint.admin_remark = val || null;
+          });
         }
         targetComplaint.updated_at = new Date().toISOString().slice(0, 19).replace('T', ' ');
         return [{ affectedRows: 1 }];
