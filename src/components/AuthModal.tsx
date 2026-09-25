@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Lock, Mail, User, Phone, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { X, Lock, Mail, User, Phone, AlertCircle, CheckCircle2, Shield, UserCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface AuthModalProps {
@@ -10,6 +10,7 @@ interface AuthModalProps {
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'login' }) => {
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
+  const [accountType, setAccountType] = useState<'citizen' | 'staff'>('citizen');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,6 +22,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
   const { login, register } = useAuth();
 
   if (!isOpen) return null;
+
+  const handleQuickFill = (type: 'citizen' | 'staff') => {
+    setMode('login');
+    setAccountType(type);
+    if (type === 'citizen') {
+      setEmail('citizen@fixmycity.org');
+      setPassword('password123');
+    } else {
+      setEmail('admin@fixmycity.org');
+      setPassword('password123');
+    }
+    setError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,16 +78,58 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
           <X className="w-5 h-5" />
         </button>
 
-        <div className="mb-6">
+        <div className="mb-5">
           <h2 className="text-2xl font-bold text-slate-900 font-sans tracking-tight">
-            {mode === 'login' ? 'Sign in to FixMyCity' : 'Create citizen account'}
+            {mode === 'login' ? 'Sign in to FixMyCity' : 'Create resident account'}
           </h2>
           <p className="text-sm text-slate-500 mt-1">
             {mode === 'login'
-              ? 'Access your submitted complaints and civic history'
+              ? 'Access your submitted complaints and city services'
               : 'Join your community to report issues and track resolutions'}
           </p>
         </div>
+
+        {/* Quick autofill helper for hands-on evaluation */}
+        {mode === 'login' && (
+          <div className="mb-4 p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5 px-0.5">
+              Hands-On Test Profiles:
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => handleQuickFill('citizen')}
+                className={`flex items-center space-x-1.5 p-2 rounded-lg text-xs font-semibold border transition-all text-left ${
+                  accountType === 'citizen' && email === 'citizen@fixmycity.org'
+                    ? 'bg-blue-50 border-blue-200 text-[#1E66F5]'
+                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                <UserCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <div className="truncate">
+                  <div className="leading-tight">Alex Morgan</div>
+                  <div className="text-[10px] text-slate-400 font-normal">Resident</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleQuickFill('staff')}
+                className={`flex items-center space-x-1.5 p-2 rounded-lg text-xs font-semibold border transition-all text-left ${
+                  accountType === 'staff' && email === 'admin@fixmycity.org'
+                    ? 'bg-amber-50 border-amber-200 text-amber-700'
+                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                <Shield className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                <div className="truncate">
+                  <div className="leading-tight">Sarah Jenkins</div>
+                  <div className="text-[10px] text-slate-400 font-normal">City Staff</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center space-x-2">
@@ -166,7 +222,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
             disabled={submitting}
             className="w-full py-2.5 px-4 bg-[#1E66F5] hover:bg-blue-700 text-white font-medium text-sm rounded-xl shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
           >
-            {submitting ? 'Processing...' : mode === 'login' ? 'Sign In' : 'Create Account'}
+            {submitting ? 'Processing...' : mode === 'login' ? 'Sign In' : 'Create Resident Account'}
           </button>
         </form>
 

@@ -13,6 +13,10 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
+  isAuthModalOpen: boolean;
+  authModalMode: 'login' | 'register';
+  openAuthModal: (mode?: 'login' | 'register') => void;
+  closeAuthModal: () => void;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   register: (data: { name: string; email: string; password: string; phone?: string }) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
@@ -25,8 +29,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('fixmycity_token'));
   const [loading, setLoading] = useState(true);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
 
-  // Initialize session
+  const openAuthModal = (mode: 'login' | 'register' = 'login') => {
+    setAuthModalMode(mode);
+    setIsAuthModalOpen(true);
+  };
+
+  const closeAuthModal = () => {
+    setIsAuthModalOpen(false);
+  };
+
+  // Initialize session from stored token
   useEffect(() => {
     const initializeAuth = async () => {
       const storedToken = localStorage.getItem('fixmycity_token');
@@ -40,12 +55,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser(null);
           }
         } catch (err) {
-          console.warn('Session verification failed, logging in default citizen demo.');
-          await loginDemo('citizen');
+          localStorage.removeItem('fixmycity_token');
+          setUser(null);
         }
       } else {
-        // Auto-login default demo citizen so the user can immediately test without barriers
-        await loginDemo('citizen');
+        // In real life, guest visitor starts unauthenticated until they sign in or register
+        setUser(null);
       }
       setLoading(false);
     };
@@ -53,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initializeAuth();
   }, []);
 
-  const loginDemo = async (role: 'citizen' | 'admin') => {
+  const loginDefaultAccount = async (role: 'citizen' | 'admin') => {
     try {
       const email = role === 'admin' ? 'admin@fixmycity.org' : 'citizen@fixmycity.org';
       const password = 'password123';
@@ -64,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(res.user);
       }
     } catch (err) {
-      console.error('Demo login error:', err);
+      console.error('Account authorization error:', err);
     }
   };
 
@@ -112,12 +127,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const switchRoleDemo = async (targetRole: 'citizen' | 'admin') => {
     setLoading(true);
-    await loginDemo(targetRole);
+    await loginDefaultAccount(targetRole);
     setLoading(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, switchRoleDemo }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        loading,
+        isAuthModalOpen,
+        authModalMode,
+        openAuthModal,
+        closeAuthModal,
+        login,
+        register,
+        logout,
+        switchRoleDemo,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

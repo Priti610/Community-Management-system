@@ -1,5 +1,6 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { ShieldAlert, ArrowLeft, LogIn, Lock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface ProtectedRouteProps {
@@ -8,8 +9,9 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin = false }) => {
-  const { user, loading } = useAuth();
+  const { user, loading, login } = useAuth();
   const location = useLocation();
+  const [switching, setSwitching] = useState(false);
 
   if (loading) {
     return (
@@ -22,23 +24,85 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requir
     );
   }
 
-  // Not logged in
-  if (!user) {
-    return <Navigate to="/" state={{ from: location }} replace />;
+  // Not logged in and admin required
+  if (!user && requireAdmin) {
+    const handleStaffSignIn = async () => {
+      setSwitching(true);
+      await login('admin@fixmycity.org', 'password123');
+      setSwitching(false);
+    };
+
+    return (
+      <div className="max-w-md mx-auto my-16 p-8 bg-white border border-slate-200 rounded-2xl text-center shadow-lg">
+        <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4 border border-amber-100 shadow-xs">
+          <Lock className="w-7 h-7" />
+        </div>
+        <h2 className="text-2xl font-bold text-slate-900 mb-2 font-sans tracking-tight">
+          Municipal Operations Portal
+        </h2>
+        <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+          This portal is restricted to authorized municipal officers and department personnel.
+        </p>
+        <div className="space-y-3">
+          <button
+            onClick={handleStaffSignIn}
+            disabled={switching}
+            className="w-full inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-[#1E66F5] hover:bg-blue-700 text-white font-semibold text-sm transition-all shadow-sm"
+          >
+            <LogIn className="w-4 h-4" />
+            <span>{switching ? 'Signing in...' : 'Sign In with Staff Account'}</span>
+          </button>
+          <Link
+            to="/"
+            className="w-full inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition-all"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Return to Public Site</span>
+          </Link>
+        </div>
+      </div>
+    );
   }
 
-  // Admin access required
-  if (requireAdmin && user.role !== 'admin') {
+  // Admin access required but user is a citizen
+  if (requireAdmin && user && user.role !== 'admin') {
+    const handleSwitchToStaff = async () => {
+      setSwitching(true);
+      await login('admin@fixmycity.org', 'password123');
+      setSwitching(false);
+    };
+
     return (
-      <div className="max-w-xl mx-auto my-16 p-8 bg-white border border-rose-200 rounded-2xl text-center shadow-xs">
-        <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4 font-bold text-xl">
-          !
+      <div className="max-w-md mx-auto my-16 p-8 bg-white border border-slate-200 rounded-2xl text-center shadow-lg">
+        <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4 border border-amber-100 shadow-xs">
+          <ShieldAlert className="w-7 h-7" />
         </div>
-        <h2 className="text-xl font-bold text-slate-900 mb-2">Municipal Admin Access Required</h2>
-        <p className="text-sm text-slate-600 mb-6">
-          Your current account does not have municipal administrative privileges. Please switch to the Municipal Admin role in the top-right header to view this section.
+        <h2 className="text-2xl font-bold text-slate-900 mb-2 font-sans tracking-tight">
+          Municipal Staff Access
+        </h2>
+        <p className="text-sm text-slate-500 mb-2 leading-relaxed">
+          Signed in as <span className="font-semibold text-slate-800">{user.name}</span> (Resident Account).
         </p>
-        <Navigate to="/admin" replace={false} />
+        <p className="text-xs text-slate-400 mb-6">
+          Accessing city operations requires municipal staff credentials.
+        </p>
+        <div className="space-y-3">
+          <button
+            onClick={handleSwitchToStaff}
+            disabled={switching}
+            className="w-full inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-[#1E66F5] hover:bg-blue-700 text-white font-semibold text-sm transition-all shadow-sm"
+          >
+            <LogIn className="w-4 h-4" />
+            <span>{switching ? 'Authenticating...' : 'Sign In as Municipal Staff'}</span>
+          </button>
+          <Link
+            to="/"
+            className="w-full inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition-all"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Return to Citizen Portal</span>
+          </Link>
+        </div>
       </div>
     );
   }

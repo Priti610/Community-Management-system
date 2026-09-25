@@ -102,16 +102,17 @@ export const Home: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10">
       {/* Hero Section */}
-      <section className="relative rounded-3xl overflow-hidden bg-slate-950 text-white shadow-xl min-h-[460px] flex flex-col justify-between p-6 sm:p-10 lg:p-12">
-        {/* Background Image with dark gradient overlay matching Screenshot 1 */}
+      <section className="relative rounded-3xl overflow-hidden bg-slate-950 text-white shadow-xl min-h-[480px] flex flex-col justify-between p-6 sm:p-10 lg:p-12">
+        {/* Background Image: Municipal sanitation and civic workers on duty */}
         <div
-          className="absolute inset-0 z-0 bg-cover bg-center opacity-35 mix-blend-luminosity filter contrast-125"
+          className="absolute inset-0 z-0 bg-cover bg-right md:bg-[center_right] transition-all duration-700"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1800&q=80')`,
+            backgroundImage: `url('/hero.jpg')`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-slate-900/60 z-0" />
-        <div className="absolute inset-0 bg-radial from-transparent via-transparent to-black/60 z-0" />
+        {/* Dark left vignette for high-contrast typographic readability while showcasing the workers on the right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#070e1b] via-[#070e1b]/85 to-transparent sm:via-[#070e1b]/70 sm:to-transparent z-0" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#070e1b]/95 via-transparent to-transparent sm:hidden z-0" />
 
         {/* Hero Content */}
         <div className="relative z-10 max-w-2xl">

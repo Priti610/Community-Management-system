@@ -10,8 +10,10 @@ import {
   AlertCircle,
   X,
   Upload,
+  LogIn,
 } from 'lucide-react';
 import { complaintService } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const CATEGORIES = [
   'Garbage Accumulation',
@@ -26,6 +28,7 @@ const CATEGORIES = [
 ];
 
 export const ReportIssue: React.FC = () => {
+  const { user, openAuthModal } = useAuth();
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [location, setLocation] = useState('');
@@ -66,6 +69,13 @@ export const ReportIssue: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    // If unauthenticated, require sign in
+    if (!user) {
+      setError('Please sign in or create an account to file an official report.');
+      openAuthModal('login');
+      return;
+    }
 
     // Validation
     if (!title.trim()) {

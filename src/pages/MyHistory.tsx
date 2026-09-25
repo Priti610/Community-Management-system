@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { FileText, ChevronRight, Plus, AlertCircle, RefreshCw } from 'lucide-react';
+import { FileText, ChevronRight, Plus, AlertCircle, RefreshCw, LogIn, Search } from 'lucide-react';
 import { complaintService } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import StatusBadge from '../components/StatusBadge';
 import { formatDateTime } from '../utils/formatters';
 
@@ -18,12 +19,14 @@ interface MyComplaint {
 }
 
 export const MyHistory: React.FC = () => {
+  const { user, openAuthModal } = useAuth();
   const [complaints, setComplaints] = useState<MyComplaint[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const fetchMyComplaints = async () => {
+    if (!user) return;
     setLoading(true);
     setError(null);
     try {
@@ -41,8 +44,44 @@ export const MyHistory: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchMyComplaints();
-  }, []);
+    if (user) {
+      fetchMyComplaints();
+    }
+  }, [user]);
+
+  if (!user) {
+    return (
+      <div className="max-w-xl mx-auto my-16 p-8 bg-white border border-slate-200 rounded-3xl text-center shadow-lg space-y-6">
+        <div className="w-16 h-16 rounded-2xl bg-blue-50 text-[#1E66F5] flex items-center justify-center mx-auto shadow-inner">
+          <FileText className="w-8 h-8 stroke-[1.8]" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight font-sans">
+            Sign In to View Complaint History
+          </h2>
+          <p className="text-sm text-slate-500 mt-2 max-w-sm mx-auto leading-relaxed">
+            Access your personal dashboard of submitted neighborhood issues, municipal assignments, and official updates.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <button
+            onClick={() => openAuthModal('login')}
+            className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-2.5 rounded-xl bg-[#1E66F5] hover:bg-blue-600 text-white font-semibold text-sm shadow-sm transition-all"
+          >
+            <LogIn className="w-4 h-4" />
+            <span>Sign In / Register</span>
+          </button>
+          <Link
+            to="/track"
+            className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition-all"
+          >
+            <Search className="w-4 h-4" />
+            <span>Track by Complaint ID</span>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
