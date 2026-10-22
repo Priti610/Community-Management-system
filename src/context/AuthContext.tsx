@@ -20,7 +20,6 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   register: (data: { name: string; email: string; password: string; phone?: string }) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
-  switchRoleDemo: (role: 'citizen' | 'admin') => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -68,21 +67,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initializeAuth();
   }, []);
 
-  const loginDefaultAccount = async (role: 'citizen' | 'admin') => {
-    try {
-      const email = role === 'admin' ? 'admin@fixmycity.org' : 'citizen@fixmycity.org';
-      const password = 'password123';
-      const res = await authService.login({ email, password });
-      if (res.success && res.token) {
-        localStorage.setItem('fixmycity_token', res.token);
-        setToken(res.token);
-        setUser(res.user);
-      }
-    } catch (err) {
-      console.error('Account authorization error:', err);
-    }
-  };
-
   const login = async (email: string, password: string) => {
     try {
       const res = await authService.login({ email, password });
@@ -125,12 +109,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
-  const switchRoleDemo = async (targetRole: 'citizen' | 'admin') => {
-    setLoading(true);
-    await loginDefaultAccount(targetRole);
-    setLoading(false);
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -144,7 +122,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         register,
         logout,
-        switchRoleDemo,
       }}
     >
       {children}

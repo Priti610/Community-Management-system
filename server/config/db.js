@@ -44,7 +44,7 @@ class FallbackDatabase {
     this.users = [
       {
         id: 1,
-        name: 'Alex Morgan',
+        name: 'Citizen Resident',
         email: 'citizen@fixmycity.org',
         password: defaultPassword,
         phone: '+1 (555) 234-5678',
@@ -53,7 +53,7 @@ class FallbackDatabase {
       },
       {
         id: 2,
-        name: 'Sarah Jenkins',
+        name: 'Municipal Administrator',
         email: 'admin@fixmycity.org',
         password: defaultPassword,
         phone: '+1 (555) 987-6543',
@@ -171,21 +171,21 @@ class FallbackDatabase {
 
     // Timeline updates
     this.complaintUpdates = [
-      { id: 1, complaint_id: 'FMC-2026-0C2083', old_status: null, new_status: 'Submitted', remark: 'Complaint submitted by citizen.', updated_by: 'Alex Morgan', created_at: '2026-09-24 10:55:00' },
-      { id: 2, complaint_id: 'FMC-2026-2DCC7C', old_status: null, new_status: 'Submitted', remark: 'Complaint submitted by citizen.', updated_by: 'Alex Morgan', created_at: '2026-09-24 10:54:00' },
-      { id: 3, complaint_id: 'FMC-2026-5FA9B7', old_status: null, new_status: 'Submitted', remark: 'Complaint submitted by citizen.', updated_by: 'Alex Morgan', created_at: '2026-09-24 10:53:00' },
-      { id: 4, complaint_id: 'FMC-2026-5FA9B7', old_status: 'Submitted', new_status: 'Under Review', remark: 'Report reviewed by dispatch.', updated_by: 'Sarah Jenkins (Admin)', created_at: '2026-09-24 11:00:00' },
-      { id: 5, complaint_id: 'FMC-2026-5FA9B7', old_status: 'Under Review', new_status: 'Assigned', remark: 'Assigned to Sanitation Department', updated_by: 'Sarah Jenkins (Admin)', created_at: '2026-09-24 11:10:00' },
-      { id: 6, complaint_id: 'FMC-2026-5FA9B7', old_status: 'Assigned', new_status: 'In Progress', remark: 'Sanitation Crew #3 dispatched to North Gate.', updated_by: 'Sarah Jenkins (Admin)', created_at: '2026-09-24 11:30:00' },
-      { id: 7, complaint_id: 'FMC-2026-50B11F', old_status: null, new_status: 'Submitted', remark: 'Complaint submitted by citizen.', updated_by: 'Alex Morgan', created_at: '2026-09-24 10:53:00' },
-      { id: 8, complaint_id: 'FMC-2026-50B11F', old_status: 'Submitted', new_status: 'Under Review', remark: 'Prioritizing safety hazard assessment.', updated_by: 'Sarah Jenkins (Admin)', created_at: '2026-09-24 11:15:00' },
-      { id: 9, complaint_id: 'FMC-2026-20082E', old_status: null, new_status: 'Submitted', remark: 'Complaint submitted by citizen.', updated_by: 'Alex Morgan', created_at: '2026-09-24 10:53:00' },
-      { id: 10, complaint_id: 'FMC-2026-20082E', old_status: 'Submitted', new_status: 'Under Review', remark: 'Initial triage complete.', updated_by: 'Sarah Jenkins (Admin)', created_at: '2026-09-24 11:05:00' },
-      { id: 11, complaint_id: 'FMC-2026-20082E', old_status: 'Under Review', new_status: 'Assigned', remark: 'Assigned to Water Department (Inspector Rodriguez).', updated_by: 'Sarah Jenkins (Admin)', created_at: '2026-09-24 11:20:00' },
-      { id: 12, complaint_id: 'FMC-2026-88A129', old_status: null, new_status: 'Submitted', remark: 'Complaint submitted by citizen.', updated_by: 'Alex Morgan', created_at: '2026-09-23 16:15:00' },
-      { id: 13, complaint_id: 'FMC-2026-88A129', old_status: 'Submitted', new_status: 'Assigned', remark: 'Assigned to Electricity Department.', updated_by: 'Sarah Jenkins (Admin)', created_at: '2026-09-23 17:00:00' },
-      { id: 14, complaint_id: 'FMC-2026-88A129', old_status: 'Assigned', new_status: 'In Progress', remark: 'Repair truck dispatched.', updated_by: 'Sarah Jenkins (Admin)', created_at: '2026-09-24 08:30:00' },
-      { id: 15, complaint_id: 'FMC-2026-88A129', old_status: 'In Progress', new_status: 'Resolved', remark: 'Replaced ballast and LED fixture. Tested functional.', updated_by: 'Sarah Jenkins (Admin)', created_at: '2026-09-24 09:40:00' },
+      { id: 1, complaint_id: 'FMC-2026-0C2083', old_status: null, new_status: 'Submitted', remark: 'Complaint submitted by citizen.', updated_by: 'Citizen Resident', created_at: '2026-09-24 10:55:00' },
+      { id: 2, complaint_id: 'FMC-2026-2DCC7C', old_status: null, new_status: 'Submitted', remark: 'Complaint submitted by citizen.', updated_by: 'Citizen Resident', created_at: '2026-09-24 10:54:00' },
+      { id: 3, complaint_id: 'FMC-2026-5FA9B7', old_status: null, new_status: 'Submitted', remark: 'Complaint submitted by citizen.', updated_by: 'Citizen Resident', created_at: '2026-09-24 10:53:00' },
+      { id: 4, complaint_id: 'FMC-2026-5FA9B7', old_status: 'Submitted', new_status: 'Under Review', remark: 'Report reviewed by dispatch.', updated_by: 'Municipal Officer', created_at: '2026-09-24 11:00:00' },
+      { id: 5, complaint_id: 'FMC-2026-5FA9B7', old_status: 'Under Review', new_status: 'Assigned', remark: 'Assigned to Sanitation Department', updated_by: 'Municipal Officer', created_at: '2026-09-24 11:10:00' },
+      { id: 6, complaint_id: 'FMC-2026-5FA9B7', old_status: 'Assigned', new_status: 'In Progress', remark: 'Sanitation Crew #3 dispatched to North Gate.', updated_by: 'Municipal Officer', created_at: '2026-09-24 11:30:00' },
+      { id: 7, complaint_id: 'FMC-2026-50B11F', old_status: null, new_status: 'Submitted', remark: 'Complaint submitted by citizen.', updated_by: 'Citizen Resident', created_at: '2026-09-24 10:53:00' },
+      { id: 8, complaint_id: 'FMC-2026-50B11F', old_status: 'Submitted', new_status: 'Under Review', remark: 'Prioritizing safety hazard assessment.', updated_by: 'Municipal Officer', created_at: '2026-09-24 11:15:00' },
+      { id: 9, complaint_id: 'FMC-2026-20082E', old_status: null, new_status: 'Submitted', remark: 'Complaint submitted by citizen.', updated_by: 'Citizen Resident', created_at: '2026-09-24 10:53:00' },
+      { id: 10, complaint_id: 'FMC-2026-20082E', old_status: 'Submitted', new_status: 'Under Review', remark: 'Initial triage complete.', updated_by: 'Municipal Officer', created_at: '2026-09-24 11:05:00' },
+      { id: 11, complaint_id: 'FMC-2026-20082E', old_status: 'Under Review', new_status: 'Assigned', remark: 'Assigned to Water Department (Inspector Rodriguez).', updated_by: 'Municipal Officer', created_at: '2026-09-24 11:20:00' },
+      { id: 12, complaint_id: 'FMC-2026-88A129', old_status: null, new_status: 'Submitted', remark: 'Complaint submitted by citizen.', updated_by: 'Citizen Resident', created_at: '2026-09-23 16:15:00' },
+      { id: 13, complaint_id: 'FMC-2026-88A129', old_status: 'Submitted', new_status: 'Assigned', remark: 'Assigned to Electricity Department.', updated_by: 'Municipal Officer', created_at: '2026-09-23 17:00:00' },
+      { id: 14, complaint_id: 'FMC-2026-88A129', old_status: 'Assigned', new_status: 'In Progress', remark: 'Repair truck dispatched.', updated_by: 'Municipal Officer', created_at: '2026-09-24 08:30:00' },
+      { id: 15, complaint_id: 'FMC-2026-88A129', old_status: 'In Progress', new_status: 'Resolved', remark: 'Replaced ballast and LED fixture. Tested functional.', updated_by: 'Municipal Officer', created_at: '2026-09-24 09:40:00' },
     ];
     this.updateAutoId = 16;
   }

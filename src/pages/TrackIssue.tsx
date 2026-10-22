@@ -63,13 +63,6 @@ interface MiniComplaint {
   department_name?: string;
 }
 
-const SAMPLE_IDS = [
-  { id: 'FMC-2026-0C2083', label: 'Curb Ramp (Submitted)' },
-  { id: 'FMC-2026-50B11F', label: 'Pothole (Under Review)' },
-  { id: 'FMC-2026-5FA9B7', label: 'Bins (In Progress)' },
-  { id: 'FMC-2026-88A129', label: 'Streetlight (Resolved)' },
-];
-
 export const TrackIssue: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialId = searchParams.get('id') || '';
@@ -254,19 +247,10 @@ export const TrackIssue: React.FC = () => {
             </button>
           </form>
 
-          {/* Quick-Click Sample IDs */}
-          <div className="flex flex-wrap items-center gap-2 pt-1">
-            <span className="text-xs text-slate-400 font-medium">Quick examples:</span>
-            {SAMPLE_IDS.map((sample) => (
-              <button
-                key={sample.id}
-                type="button"
-                onClick={() => handleSelectComplaint(sample.id)}
-                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-[#1E66F5] text-slate-600 text-xs font-mono font-medium transition-colors cursor-pointer border border-slate-200/60"
-              >
-                {sample.id}
-              </button>
-            ))}
+          {/* Reference ID Format Helper */}
+          <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-slate-400">
+            <span className="font-medium">Format:</span>
+            <span className="font-mono text-slate-500">FMC-YYYY-XXXXXX (e.g. FMC-2026-XXXXXX)</span>
           </div>
         </div>
       )}
@@ -289,17 +273,19 @@ export const TrackIssue: React.FC = () => {
             <h3 className="text-lg font-bold text-slate-900">Complaint Not Found</h3>
             <p className="text-sm text-slate-500 max-w-md mx-auto mt-1">{error}</p>
           </div>
-          <div className="pt-2 flex flex-wrap justify-center gap-2">
-            <span className="text-xs text-slate-400 w-full mb-1">Click an existing report below to test live tracking:</span>
-            {SAMPLE_IDS.map((sample) => (
-              <button
-                key={sample.id}
-                onClick={() => handleSelectComplaint(sample.id)}
-                className="px-3 py-1.5 rounded-xl bg-blue-50 text-[#1E66F5] text-xs font-semibold hover:bg-blue-100 transition-colors"
-              >
-                Track {sample.id} ({sample.label})
-              </button>
-            ))}
+          <div className="pt-2 flex flex-wrap justify-center gap-3">
+            <button
+              onClick={() => setActiveTab('all')}
+              className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+            >
+              Browse Public Complaints
+            </button>
+            <button
+              onClick={() => navigate('/report')}
+              className="px-4 py-2 rounded-xl bg-[#1E66F5] hover:bg-blue-600 text-white text-xs font-semibold transition-colors cursor-pointer"
+            >
+              Report a New Issue
+            </button>
           </div>
         </div>
       )}

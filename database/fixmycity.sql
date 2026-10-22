@@ -105,8 +105,8 @@ INSERT INTO `departments` (`id`, `name`, `description`) VALUES
 -- Passwords below are hashed with bcrypt (password is 'password123')
 -- --------------------------------------------------------------
 INSERT INTO `users` (`id`, `name`, `email`, `password`, `phone`, `role`, `created_at`) VALUES
-(1, 'Alex Morgan', 'citizen@fixmycity.org', '$2a$10$w8B7iM.v6XmU/xHq3C6ege8wW8p1d2cT0w5s4f1V3b9a0m1q2y4u2', '+1 (555) 234-5678', 'citizen', '2026-09-20 09:00:00'),
-(2, 'Sarah Jenkins', 'admin@fixmycity.org', '$2a$10$w8B7iM.v6XmU/xHq3C6ege8wW8p1d2cT0w5s4f1V3b9a0m1q2y4u2', '+1 (555) 987-6543', 'admin', '2026-09-20 09:00:00');
+(1, 'Citizen Resident', 'citizen@fixmycity.org', '$2a$10$w8B7iM.v6XmU/xHq3C6ege8wW8p1d2cT0w5s4f1V3b9a0m1q2y4u2', '+1 (555) 234-5678', 'citizen', '2026-09-20 09:00:00'),
+(2, 'Municipal Administrator', 'admin@fixmycity.org', '$2a$10$w8B7iM.v6XmU/xHq3C6ege8wW8p1d2cT0w5s4f1V3b9a0m1q2y4u2', '+1 (555) 987-6543', 'admin', '2026-09-20 09:00:00');
 
 -- --------------------------------------------------------------
 -- SEED DATA: Complaints (Matching Prototype Numbers)
@@ -123,18 +123,18 @@ INSERT INTO `complaints` (`id`, `complaint_id`, `user_id`, `category`, `title`, 
 -- SEED DATA: Complaint Updates (Timeline History)
 -- --------------------------------------------------------------
 INSERT INTO `complaint_updates` (`complaint_id`, `old_status`, `new_status`, `remark`, `updated_by`, `created_at`) VALUES
-('FMC-2026-0C2083', NULL, 'Submitted', 'Complaint submitted by citizen.', 'Alex Morgan', '2026-09-24 10:55:00'),
-('FMC-2026-2DCC7C', NULL, 'Submitted', 'Complaint submitted by citizen.', 'Alex Morgan', '2026-09-24 10:54:00'),
-('FMC-2026-5FA9B7', NULL, 'Submitted', 'Complaint submitted by citizen.', 'Alex Morgan', '2026-09-24 10:53:00'),
-('FMC-2026-5FA9B7', 'Submitted', 'Under Review', 'Report reviewed by dispatch.', 'Sarah Jenkins (Admin)', '2026-09-24 11:00:00'),
-('FMC-2026-5FA9B7', 'Under Review', 'Assigned', 'Assigned to Sanitation Department', 'Sarah Jenkins (Admin)', '2026-09-24 11:10:00'),
-('FMC-2026-5FA9B7', 'Assigned', 'In Progress', 'Sanitation Crew #3 dispatched to North Gate.', 'Sarah Jenkins (Admin)', '2026-09-24 11:30:00'),
-('FMC-2026-50B11F', NULL, 'Submitted', 'Complaint submitted by citizen.', 'Alex Morgan', '2026-09-24 10:53:00'),
-('FMC-2026-50B11F', 'Submitted', 'Under Review', 'Prioritizing safety hazard assessment.', 'Sarah Jenkins (Admin)', '2026-09-24 11:15:00'),
-('FMC-2026-20082E', NULL, 'Submitted', 'Complaint submitted by citizen.', 'Alex Morgan', '2026-09-24 10:53:00'),
-('FMC-2026-20082E', 'Submitted', 'Under Review', 'Initial triage complete.', 'Sarah Jenkins (Admin)', '2026-09-24 11:05:00'),
-('FMC-2026-20082E', 'Under Review', 'Assigned', 'Assigned to Water Department (Inspector Rodriguez).', 'Sarah Jenkins (Admin)', '2026-09-24 11:20:00'),
-('FMC-2026-88A129', NULL, 'Submitted', 'Complaint submitted by citizen.', 'Alex Morgan', '2026-09-23 16:15:00'),
-('FMC-2026-88A129', 'Submitted', 'Assigned', 'Assigned to Electricity Department.', 'Sarah Jenkins (Admin)', '2026-09-23 17:00:00'),
-('FMC-2026-88A129', 'Assigned', 'In Progress', 'Repair truck dispatched.', 'Sarah Jenkins (Admin)', '2026-09-24 08:30:00'),
-('FMC-2026-88A129', 'In Progress', 'Resolved', 'Replaced ballast and LED fixture. Tested functional.', 'Sarah Jenkins (Admin)', '2026-09-24 09:40:00');
+('FMC-2026-0C2083', NULL, 'Submitted', 'Complaint submitted by citizen.', 'Citizen Resident', '2026-09-24 10:55:00'),
+('FMC-2026-2DCC7C', NULL, 'Submitted', 'Complaint submitted by citizen.', 'Citizen Resident', '2026-09-24 10:54:00'),
+('FMC-2026-5FA9B7', NULL, 'Submitted', 'Complaint submitted by citizen.', 'Citizen Resident', '2026-09-24 10:53:00'),
+('FMC-2026-5FA9B7', 'Submitted', 'Under Review', 'Report reviewed by dispatch.', 'Municipal Officer', '2026-09-24 11:00:00'),
+('FMC-2026-5FA9B7', 'Under Review', 'Assigned', 'Assigned to Sanitation Department', 'Municipal Officer', '2026-09-24 11:10:00'),
+('FMC-2026-5FA9B7', 'Assigned', 'In Progress', 'Sanitation Crew #3 dispatched to North Gate.', 'Municipal Officer', '2026-09-24 11:30:00'),
+('FMC-2026-50B11F', NULL, 'Submitted', 'Complaint submitted by citizen.', 'Citizen Resident', '2026-09-24 10:53:00'),
+('FMC-2026-50B11F', 'Submitted', 'Under Review', 'Prioritizing safety hazard assessment.', 'Municipal Officer', '2026-09-24 11:15:00'),
+('FMC-2026-20082E', NULL, 'Submitted', 'Complaint submitted by citizen.', 'Citizen Resident', '2026-09-24 10:53:00'),
+('FMC-2026-20082E', 'Submitted', 'Under Review', 'Initial triage complete.', 'Municipal Officer', '2026-09-24 11:05:00'),
+('FMC-2026-20082E', 'Under Review', 'Assigned', 'Assigned to Water Department (Inspector Rodriguez).', 'Municipal Officer', '2026-09-24 11:20:00'),
+('FMC-2026-88A129', NULL, 'Submitted', 'Complaint submitted by citizen.', 'Citizen Resident', '2026-09-23 16:15:00'),
+('FMC-2026-88A129', 'Submitted', 'Assigned', 'Assigned to Electricity Department.', 'Municipal Officer', '2026-09-23 17:00:00'),
+('FMC-2026-88A129', 'Assigned', 'In Progress', 'Repair truck dispatched.', 'Municipal Officer', '2026-09-24 08:30:00'),
+('FMC-2026-88A129', 'In Progress', 'Resolved', 'Replaced ballast and LED fixture. Tested functional.', 'Municipal Officer', '2026-09-24 09:40:00');
